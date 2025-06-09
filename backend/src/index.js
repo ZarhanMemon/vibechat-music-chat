@@ -33,8 +33,6 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Define temp directory for file uploads
-const tempDir = path.join(__dirname, "../temp");
 
 // Validate essential env vars
 if (!process.env.PORT || !process.env.ADMIN_EMAIL || !process.env.CLERK_SECRET_KEY) {
@@ -74,7 +72,8 @@ app.use(
 );
 
 
-// Cron cleanup (adjusted to match temp directory)
+// cron jobs
+const tempDir = path.join(process.cwd(), "temp");
 cron.schedule("0 * * * *", () => {
 	if (fs.existsSync(tempDir)) {
 		fs.readdir(tempDir, (err, files) => {
@@ -103,13 +102,11 @@ app.use('/api/states', statesRoute);
 // Start Server after DB Connection
 
 // Serve frontend in production
-if (process.env.NODE_ENV === 'production') {
-  const clientBuildPath = path.join(__dirname, '../frontend/dist');
-  app.use(express.static(clientBuildPath));
-  // Catch-all must come **after** static & API routes
-  app.get('*', (_, res) => {
-    res.sendFile(path.join(clientBuildPath, '../frontend/dist/index.html'));
-  });
+if (process.env.NODE_ENV === "production") {
+	app.use(express.static(path.join(__dirname, "../frontend/dist")));
+	app.get("*", (req, res) => {
+		res.sendFile(path.resolve(__dirname, "../frontend", "dist", "index.html"));
+	});
 }
 
 // error handler
