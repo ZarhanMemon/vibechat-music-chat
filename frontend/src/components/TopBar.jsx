@@ -18,21 +18,23 @@ function TopBar() {
       <div className="flex items-center gap-2">
         <Link to="/" className="flex items-center space-x-1.5 group">
 
-        <img
-          src={"/music.png"}
-          alt="VibeChat Logo"
-          className="h-8 w-8 rounded-full hidden md:block object-cover transition-transform duration-300 group-hover:scale-110"
-          loading="lazy"
-        />
+<div className="flex items-center space-x-2 group">
+  <img
+    src="/music.png"
+    alt="VibeChat Logo"
+    className="h-8 w-8 rounded-full hidden md:block object-cover transition-transform duration-300 group-hover:scale-110"
+    loading="lazy"
+  />
 
-        <span className="text-2xl font-bold group transition-colors duration-300">
-  <span className="text-green-500 group-hover:text-green-700 transition-colors duration-300">
-    Vibe
+  <span className="text-2xl font-bold transition-colors duration-300">
+    <span className="text-green-500 group-hover:text-green-700 transition-colors duration-300">
+      Vibe
+    </span>
+    <span className="text-white group-hover:text-gray-300 transition-colors duration-300">
+      Chat
+    </span>
   </span>
-  <span className="text-white group-hover:text-gray-300 transition-colors duration-300">
-    Chat
-  </span>
-</span>
+</div>
 
         </Link>
       </div>
