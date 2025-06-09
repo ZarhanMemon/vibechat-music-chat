@@ -3,7 +3,7 @@ import { axiosInstance } from '../lib/axios.js';
 import { io } from "socket.io-client";
 
 
-const baseURL = import.meta.env.MODE === "development" ? "http://localhost:5001/api" : "/api";
+const baseURL = import.meta.env.MODE === "development" ? "http://localhost:5001" : "/";
 
 const socket = io(baseURL, {
   autoConnect: false, // only connect if user is authenticated
