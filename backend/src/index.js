@@ -102,11 +102,13 @@ app.use('/api/states', statesRoute);
 // Start Server after DB Connection
 
 // Serve frontend in production
-if (process.env.NODE_ENV === "production") {
-	app.use(express.static(path.join(__dirname, "../frontend/dist")));
-	app.get("*", (req, res) => {
-		res.sendFile(path.resolve(__dirname, "../frontend", "dist", "index.html"));
-	});
+if (process.env.NODE_ENV === 'production') {
+  const clientBuildPath = path.join(__dirname, '../frontend/dist');
+  app.use(express.static(clientBuildPath));
+  // Catch-all must come **after** static & API routes
+  app.get('*', (_, res) => {
+    res.sendFile(path.join(clientBuildPath, '../frontend/dist/index.html'));
+  });
 }
 
 // error handler
