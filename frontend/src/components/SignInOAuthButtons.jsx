@@ -25,7 +25,7 @@ const SignInOAuthButtons = () => {
   <img
     src="/google.png"
     alt="Google"
-    className="w-5 h-5"
+    className="w-6 h-6 md:w-5 md:h-5"
     loading="lazy"
   />
   <span className="hidden md:inline-block ml-2">Continue with Google</span>
