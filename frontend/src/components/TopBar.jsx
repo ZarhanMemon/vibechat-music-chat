@@ -25,9 +25,15 @@ function TopBar() {
           loading="lazy"
         />
 
-          <span className="text-2xl font-bold text-green-500 group-hover:text-green-700 transition-colors duration-300">
-            Vibe<span className="text-white">Chat</span>
-          </span>
+        <span className="text-2xl font-bold group transition-colors duration-300">
+  <span className="text-green-500 group-hover:text-green-700 transition-colors duration-300">
+    Vibe
+  </span>
+  <span className="text-white group-hover:text-gray-300 transition-colors duration-300">
+    Chat
+  </span>
+</span>
+
         </Link>
       </div>
 
