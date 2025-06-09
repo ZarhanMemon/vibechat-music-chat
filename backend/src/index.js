@@ -33,6 +33,9 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// Define temp directory for file uploads
+const tempDir = path.join(__dirname, "../temp");
+
 // Validate essential env vars
 if (!process.env.PORT || !process.env.ADMIN_EMAIL || !process.env.CLERK_SECRET_KEY) {
   console.error("❌ Missing essential environment variables in .env");

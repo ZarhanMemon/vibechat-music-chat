@@ -46,6 +46,7 @@
     "tailwind-merge": "^3.3.0",
     "tailwindcss": "^4.1.7",
     "tailwindcss-animate": "^1.0.7",
+    "vibechat_2": "file:..",
     "zod": "^3.25.51",
     "zustand": "^5.0.4"
   },
