@@ -107,7 +107,7 @@ if (process.env.NODE_ENV === 'production') {
   const clientBuildPath = path.join(__dirname, '../frontend/dist');
   app.use(express.static(clientBuildPath));
   // Catch-all must come **after** static & API routes
-  app.get('/*any', (_, res) => {
+  app.get('*', (_, res) => {
     res.sendFile(path.join(clientBuildPath, '../frontend/dist/index.html'));
   });
 }
