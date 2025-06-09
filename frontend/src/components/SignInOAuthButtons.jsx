@@ -28,7 +28,7 @@ const SignInOAuthButtons = () => {
                 className="w-4 h-4 md:w-5 md:h-5"
                 loading="lazy"
             />
-            <span className="truncate">Continue with Google</span>
+            <span className="truncate hidden md:block">Continue with Google</span>
         </Button>
     );
 };
