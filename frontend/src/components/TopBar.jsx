@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "./ui/button";
 import useAuthStore from "@/store/useAuthStore";
 import useUserStore from "@/store/useUserStore";
-import logo from "@/logo/music.png";
+
 
 function TopBar() {
   const { isAdmin } = useAuthStore();
@@ -17,6 +17,14 @@ function TopBar() {
     <div className='flex items-center justify-between p-3 sticky top-0 bg-zinc-900 backdrop-blur-md z-10'>
       <div className="flex items-center gap-2">
         <Link to="/" className="flex items-center space-x-1.5 group">
+
+        <img
+          src={"/music.png"}
+          alt="VibeChat Logo"
+          className="h-8 w-8 rounded-full hidden md:block object-cover transition-transform duration-300 group-hover:scale-110"
+          loading="lazy"
+        />
+
           <span className="text-2xl font-bold text-green-500 group-hover:text-green-700 transition-colors duration-300">
             Vibe<span className="text-white">Chat</span>
           </span>
