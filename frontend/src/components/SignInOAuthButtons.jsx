@@ -17,19 +17,20 @@ const SignInOAuthButtons = () => {
     };
 
     return (
-     <Button
+   <Button
   onClick={signInWithGoogle}
   variant="secondary"
-  className="w-full h-11 text-white border-zinc-200 flex items-center justify-center gap-2 md:gap-3 text-sm md:text-base"
+  className="w-full h-11 text-white border-zinc-200 flex items-center justify-center text-sm md:text-base"
 >
   <img
     src="/google.png"
     alt="Google"
-    className="w-4 h-4 md:w-5 md:h-5"
+    className="w-5 h-5"
     loading="lazy"
   />
-  <span className="hidden md:block">Continue with Google</span>
+  <span className="hidden md:inline-block ml-2">Continue with Google</span>
 </Button>
+
     );
 };
 
