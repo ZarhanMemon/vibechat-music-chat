@@ -191,6 +191,20 @@ Thanks to:
 
 ---
 
+
+## ⚠️ Known Issue
+
+While capturing sample screenshots for this project, we encountered a **bug** where:
+
+> When receiving messages through the socket connection, the **same message appears twice** in the chat interface.
+
+This is likely due to a duplicate event listener or repeated state update.  
+The issue is currently under investigation and will be addressed in a future patch.  
+It does **not** affect core functionalities during testing or demonstration.
+
+---
+
+
 ## 📄 License
 
 This project is licensed under the **MIT License**.
