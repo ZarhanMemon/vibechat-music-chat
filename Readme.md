@@ -157,26 +157,27 @@ Visit [http://localhost:5173](http://localhost:5173) to view the app.
 ### 🖥️ Desktop Views
 
 <p align="center">
-  <img src="assets/homepage.png" width="30%" />
-  <img src="assets/friends.png" width="30%" />
-  <img src="assets/player.png" width="30%" />
+<img width="960" alt="Image" src="https://github.com/user-attachments/assets/6cec005d-ad47-4724-b249-590475e07708" />
+<img width="960" alt="Image" src="https://github.com/user-attachments/assets/d60df7a8-9153-4e71-ae5a-5106c30f9e79" />
+<img width="960" alt="Image" src="https://github.com/user-attachments/assets/5591805e-de01-4b43-8b5d-c76854437f58" />
+<img width="960" alt="Image" src="https://github.com/user-attachments/assets/e282f52d-f45f-4497-a819-cfb59152ba6f" />
+<img width="541" alt="Image" src="https://github.com/user-attachments/assets/3d0c54dd-c19b-4f6c-93e5-5bf981205e33" />
 </p>
 
 ### 📱 Mobile Views
 
 <p align="center">
-  <img src="assets/mobile1.png" width="25%" />
-  <img src="assets/mobile2.png" width="25%" />
-  <img src="assets/mobile3.png" width="25%" />
+ <img width="132" alt="Image" src="https://github.com/user-attachments/assets/58aa5e94-400b-44f7-a557-b5c8c2e0ce52" />
+<img width="135" alt="Image" src="https://github.com/user-attachments/assets/b2edf86c-e8b5-4f68-bd63-e30648e031c2" />
+<img width="135" alt="Image" src="https://github.com/user-attachments/assets/813f3c98-f19c-47b6-84d8-b7e4d5373abe" />
+<img width="136" alt="Image" src="https://github.com/user-attachments/assets/5fd27fe2-9716-41d7-bc1d-c12fb3c822d8" />
+<img width="135" alt="Image" src="https://github.com/user-attachments/assets/1b233fcf-c054-4014-bdac-9745417764f3" />
+<img width="135" alt="Image" src="https://github.com/user-attachments/assets/07c19dcc-dfc4-40d8-b1a2-54f1bd9881c4" />
+<img width="135" alt="Image" src="https://github.com/user-attachments/assets/8b1cdba5-a74e-4a7f-a695-facbbe9ec38c" />
 </p>
 
 ---
 
-## 🎥 Demo Video
-
-📽️ Demo coming soon...
-
----
 
 ## 🙏 Credits
 
