@@ -8,7 +8,7 @@ function AudioPlayer() {
     const {
         currentSong,
         isPlaying,
-        playNext,
+        nextSong,
         loop,
         loopQueue,
     } = usePlayerStore();
@@ -59,7 +59,7 @@ function AudioPlayer() {
                     });
                 } else {
                     // Go to next song (playNext handles queue looping)
-                    playNext();
+                    nextSong();
                 }
             } catch (err) {
                 console.error("Error in playback loop:", err);
@@ -70,7 +70,7 @@ function AudioPlayer() {
         return () => {
             audio.removeEventListener("ended", handleEnded);
         };
-    }, [loop, loopQueue, playNext]);
+    }, [loop, loopQueue, nextSong]);
 
     return <audio ref={audioRef} preload="auto" />;
 }
