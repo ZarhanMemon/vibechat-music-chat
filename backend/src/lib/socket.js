@@ -1,158 +1,134 @@
 import { Server } from 'socket.io';
 import Message from '../modules/messageModel.js'; // Import the Message model
 
-
-
-
-
 export const initializeSocketIO = (SocketServer) => {
-    const io = new Server(SocketServer, {
-        cors: {
-            origin: 'http://localhost:5173',
-            credentials: true,
-        },
+  const io = new Server(SocketServer, {
+    cors: {
+      origin: 'http://localhost:5173',
+      credentials: true,
+    },
+  });
+
+  const connectedUsers = new Map();     // userId: socketId
+  const userActivity = new Map();       // userId: activity status
+  const unreadMessages = new Map();     // userId: Set of senderIds
+
+  io.on('connection', (socket) => {
+    console.log('New socket connection:', socket.id);
+
+    socket.on('user_connected', (userId) => {
+      if (!userId) return;
+
+      console.log(`User ${userId} connected with socket ID: ${socket.id}`);
+      connectedUsers.set(userId, socket.id);
+      userActivity.set(userId, "Idle");
+
+      // Send initial data
+      socket.emit('initialize_state', {
+        onlineUsers: Array.from(connectedUsers.keys()),
+        activities: Array.from(userActivity),
+      });
+
+      // Broadcast to others
+      io.emit('user_connected', userId);
     });
 
-    // Store connected users and their activities
-    const connectedUsers = new Map();  // userId: socketId
-    const userActivity = new Map();    // userId: activity status
-    const unreadMessages = new Map();  // userId: Set of senderIds with unread messages
+    socket.on('update_activity', ({ userId, activity }) => {
+      userActivity.set(userId, activity);
+      io.emit('activity_updated', { userId, activity });
+      console.log(`User ${userId} activity updated to: ${activity}`);
+    });
 
-    io.on('connection', (socket) => {
-        console.log('New socket connection:', socket.id);
+    socket.on('send_message', async (data) => {
+      try {
+        const { sender, recipient, content, sentAt, read } = data;
 
-        socket.on('user_connected', (userId) => {
-            if (!userId) return;
-            
-            console.log(`User ${userId} connected with socket ID: ${socket.id}`);
-            connectedUsers.set(userId, socket.id);
-            userActivity.set(userId, "Idle");
-
-            // Broadcast to everyone that this user connected
-            io.emit('user_connected', userId);
-
-            // Send current state to the newly connected user
-            socket.emit('initialize_state', {
-                onlineUsers: Array.from(connectedUsers.keys()),
-                activities: Array.from(userActivity)
-            });
-
-
-        })        
-        
-        
-        socket.on('update_activity', (data) => {
-            const { userId, activity } = data;
-            // Update the user's activity in the userActivity map
-            userActivity.set(userId, activity);
-
-            // Emit the updated activity to all connected users
-            io.emit('activity_updated', { userId, activity });
-
-            console.log(`User ${userId} activity updated to: ${activity}`);
+        const message = await Message.create({
+          sender,
+          recipient,
+          content,
+          sentAt,
+          read,
         });
 
+        // Track unread
+        if (!unreadMessages.has(recipient)) {
+          unreadMessages.set(recipient, new Set());
+        }
+        unreadMessages.get(recipient).add(sender);
 
-        socket.on('send_message', async (data) => {
+        const receiverSocketId = connectedUsers.get(recipient);
 
-            try {
+        if (receiverSocketId) {
+          io.to(receiverSocketId).emit('receive_message', message);
+          io.to(receiverSocketId).emit('unread_messages_update', {
+            unreadFrom: Array.from(unreadMessages.get(recipient)),
+          });
+        }
 
-                const {sender, recipient, content, sentAt, read} = data;
+        socket.emit('message_sent', message);
+      } catch (error) {
+        console.error('Message error:', error);
+        socket.emit('message_error', error.message);
+      }
+    });
 
-                const message = await Message.create({
-                    sender,
-                    recipient,
-                    content,
-                    sentAt,
-                    read
-                });
+    socket.on('mark_messages_read', async ({ from, to }) => {
+      try {
+        // Remove sender from recipient's unread list
+        if (unreadMessages.has(to)) {
+          unreadMessages.get(to).delete(from);
+        }
 
-                // Get recipient's socket ID
-                const receiverSocketId = connectedUsers.get(recipient);
+        // Update in database
+        await Message.updateMany(
+          { sender: from, recipient: to, read: false },
+          { $set: { read: true } }
+        );
 
-                // Track unread message
-                if (!unreadMessages.has(recipient)) {
-                    unreadMessages.set(recipient, new Set());
-                }
-                unreadMessages.get(recipient).add(sender);
+        const recipientSocket = connectedUsers.get(to);
+        if (recipientSocket) {
+          io.to(recipientSocket).emit('unread_messages_update', {
+            unreadFrom: Array.from(unreadMessages.get(to)),
+          });
+        }
+      } catch (error) {
+        console.error('Error marking messages as read:', error);
+      }
+    });
 
-                // Emit to recipient
-                if (receiverSocketId) {
-                    io.to(receiverSocketId).emit("receive_message", message);
-                    io.to(receiverSocketId).emit("unread_messages_update", {
-                        unreadFrom: Array.from(unreadMessages.get(recipient))
-                    });
-                }
+    socket.on('send_friend_request', ({ from, to }) => {
+      const receiverSocketId = connectedUsers.get(to);
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit('friend_request_received', { from });
+      }
+    });
 
-                socket.emit("message_sent", message);
+    socket.on('accept_friend_request', ({ requestId, from, to }) => {
+      const senderSocketId = connectedUsers.get(from);
+      if (senderSocketId) {
+        io.to(senderSocketId).emit('friend_request_accepted', requestId);
+      }
+    });
 
-            } catch (error) {
-                console.error("Message error:", error);
-				socket.emit("message_error", error.message);
-            }
+    socket.on('disconnect', () => {
+      let disconnectedUserId = null;
 
-        })
+      for (const [userId, socketId] of connectedUsers.entries()) {
+        if (socketId === socket.id) {
+          disconnectedUserId = userId;
+          connectedUsers.delete(userId);
+          userActivity.delete(userId);
+          unreadMessages.delete(userId); // Optional: clear memory
+          console.log(`User ${userId} disconnected`);
+          break;
+        }
+      }
 
-        // Add a handler for marking messages as read
-        socket.on('mark_messages_read', ({from, to}) => {
-            if (unreadMessages.has(to)) {
-                unreadMessages.get(to).delete(from);
-                
-                // Notify the recipient about the updated unread messages
-                const recipientSocket = connectedUsers.get(to);
-                if (recipientSocket) {
-                    io.to(recipientSocket).emit("unread_messages_update", {
-                        unreadFrom: Array.from(unreadMessages.get(to))
-                    });
-                }
-            }
-        });
-
-
-        // Friend request handling
-        socket.on('send_friend_request', async ({ from, to }) => {
-            const receiverSocketId = connectedUsers.get(to);
-            if (receiverSocketId) {
-                io.to(receiverSocketId).emit('friend_request_received', { from });
-            }
-        });
-
-        socket.on('accept_friend_request', async ({ requestId, from, to }) => {
-            const senderSocketId = connectedUsers.get(from);
-            if (senderSocketId) {
-                io.to(senderSocketId).emit('friend_request_accepted', requestId);
-            }
-        });
-
-
-        socket.on('disconnect', () => {
-
-            let disconnectedUserId; // Initialize variable to hold the disconnected userId
-
-            // Find the userId associated with the disconnected socket
-            for (const [userId, socketId] of connectedUsers.entries()) {
-
-                if (socketId === socket.id) {
-
-                    disconnectedUserId = userId; // Store the disconnected userId
-
-                    connectedUsers.delete(userId); // Remove user from connected users map
-                    userActivity.delete(userId); // Remove user activity on disconnect
-
-                    console.log(`User ${userId} disconnected`);
-
-
-                    io.emit('connected_users', userId); // Notify all users about disconnection
-                    break;
-                }
-            }
-
-            if (disconnectedUserId) {
-                io.emit('user_disconnected', disconnectedUserId);
-                console.log(`User ${disconnectedUserId} is now offline`);
-            }
-        });
-
-    })
-
-}
+      if (disconnectedUserId) {
+        io.emit('user_disconnected', disconnectedUserId);
+        console.log(`User ${disconnectedUserId} is now offline`);
+      }
+    });
+  });
+};
