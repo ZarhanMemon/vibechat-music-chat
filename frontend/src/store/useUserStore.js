@@ -30,25 +30,38 @@ const useUserStore = create((set,get) => ({
   error: null,
 
   // ACTIONS
-  initializeSocketListeners: () => {
-    const socket = get().socket;
+ initializeSocketListeners: () => {
+  const socket = get().socket;
 
-    socket.on('friend_request_received', (request) => {
-      set((state) => ({
-        incomingFriendRequests: [...state.incomingFriendRequests, request]
-      }));
-    });
+  socket.off('friend_request_received');
+  socket.on('friend_request_received', (request) => {
+    set((state) => ({
+      incomingFriendRequests: [...state.incomingFriendRequests, request]
+    }));
+  });
 
-    socket.on('friend_request_accepted', (requestId) => {
-      set((state) => ({
-        incomingFriendRequests: state.incomingFriendRequests.filter(req => req._id !== requestId),
-        outgoingFriendRequests: state.outgoingFriendRequests.filter(req => req._id !== requestId)
-      }));
-    });
+  socket.off('friend_request_accepted');
+  socket.on('friend_request_accepted', (requestId) => {
+    set((state) => ({
+      incomingFriendRequests: state.incomingFriendRequests.filter(req => req._id !== requestId),
+      outgoingFriendRequests: state.outgoingFriendRequests.filter(req => req._id !== requestId)
+    }));
+  });
 
-    // ... existing socket listeners ...
-  },
+  socket.off('receive_message'); // ✅ Prevent duplicate message handler
+  socket.on('receive_message', (message) => {
+    set((state) => ({
+      messages: [...state.messages, message],
+      unreadMessages: state.selectedUser?.clerkId !== message.sender 
+        ? Array.from(new Set([...state.unreadMessages, message.sender]))
+        : state.unreadMessages
+    }));
+  });
 
+  // Add socket.off for every event you bind
+},
+
+  
   fetchMyFriends: async () => {
     set({ loading: true, error: null });
     try {
